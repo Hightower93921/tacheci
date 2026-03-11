@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapa rodu Tachecích</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Bebas+Neue&family=Space+Mono:wght@0,400;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root {
+      --gold: #8B6410;
+      --gold-light: #C9A84C;
+      --bg: #f5e9c8;
+      --bg2: #ede0b0;
+      --text: #3d2e14;
+      --text-dim: #7a6540;
+      --border: rgba(139,100,16,0.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: 'Cormorant Garamond', serif; background: var(--bg); color: var(--text); }
+
+    /* VIGNETTE */
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(90,60,15,0.35) 100%);
+      pointer-events: none; z-index: 999;
+    }
+
+    /* HEADER */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.9rem 2rem;
+      background: rgba(245,233,200,0.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .h-brand { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.15em; color: var(--gold); text-decoration: none; }
+    .h-title { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); }
+    .h-back { font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
+    .h-back:hover { color: var(--gold); }
+
+    /* MAP */
+    #map {
+      position: fixed;
+      top: 56px; left: 0; right: 360px; bottom: 140px;
+      z-index: 1;
+    }
+
+    /* SIDEBAR */
+    #sidebar {
+      position: fixed;
+      top: 56px; right: 0; width: 360px; bottom: 140px;
+      background: var(--bg2);
+      border-left: 1px solid var(--border);
+      overflow-y: auto;
+      z-index: 2;
+    }
+
+    .sidebar-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; padding: 2rem; text-align: center; color: var(--text-dim);
+    }
+    .sidebar-empty .icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4; }
+    .sidebar-empty p { font-size: 1rem; font-style: italic; line-height: 1.6; }
+
+    .sidebar-content { padding: 2rem; display: none; }
+    .sidebar-content.active { display: block; }
+
+    .sc-year {
+      font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--gold);
+      letter-spacing: 0.05em; line-height: 1; margin-bottom: 0.2rem;
+    }
+    .sc-badge {
+      display: inline-block; font-family: 'Space Mono', monospace; font-size: 0.5rem;
+      background: var(--gold); color: #f5e9c8; padding: 2px 7px; letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .sc-name {
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.05em;
+      color: var(--text); margin-bottom: 0.5rem;
+    }
+    .sc-event { font-size: 1.1rem; color: var(--text); line-height: 1.6; margin-bottom: 1rem; }
+    .sc-note { font-size: 0.95rem; font-style: italic; color: var(--text-dim); line-height: 1.6; border-left: 2px solid var(--border); padding-left: 1rem; }
+
+    .sc-divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+    .sc-label { font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; }
+    .sc-people { display: flex; flex-direction: column; gap: 0.4rem; }
+    .sc-person { font-size: 1rem; color: var(--text-dim); display: flex; gap: 0.5rem; align-items: flex-start; }
+    .sc-person::before { content: '—'; color: var(--gold); flex-shrink: 0; }
+
+    /* TIMELINE SLIDER */
+    #timeline {
+      position: fixed;
+      bottom: 0; left: 0; right: 0; height: 140px;
+      background: rgba(245,233,200,0.97); backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      padding: 1.2rem 2rem;
+      z-index: 10;
+      display: flex; flex-direction: column; gap: 0.8rem;
+    }
+
+    .tl-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .tl-current-year {
+      font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--gold); letter-spacing: 0.05em; line-height: 1;
+    }
+    .tl-info {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; color: var(--text-dim);
+      text-align: right;
+    }
+    .tl-info span { color: var(--gold); }
+
+    /* Slider */
+    .slider-wrap { position: relative; }
+    input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 2px;
+      background: var(--border); outline: none; cursor: pointer;
+      border-radius: 0;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 16px; height: 16px;
+      background: var(--gold); border-radius: 50%;
+      cursor: pointer; transition: transform 0.15s;
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 1px var(--gold);
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+    /* Tick marks */
+    .tl-ticks {
+      display: flex; justify-content: space-between;
+      padding: 0 8px;
+    }
+    .tl-tick {
+      font-family: 'Space Mono', monospace; font-size: 0.52rem;
+      color: var(--text-dim); letter-spacing: 0.05em;
+      cursor: pointer; transition: color 0.2s;
+      position: relative;
+    }
+    .tl-tick:hover { color: var(--gold); }
+    .tl-tick.active { color: var(--gold); font-weight: 700; }
+    .tl-tick::before { content: '|'; display: block; text-align: center; margin-bottom: 2px; opacity: 0.4; }
+
+    /* Leaflet custom */
+    .leaflet-container { background: #e8d9a8 !important; }
+
+    .custom-marker {
+      width: 12px; height: 12px;
+      background: var(--gold-light);
+      border: 2px solid var(--gold);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s;
+      box-shadow: 0 0 0 3px rgba(139,100,16,0.2);
+    }
+    .custom-marker.origin {
+      background: var(--gold);
+      box-shadow: 0 0 0 4px rgba(139,100,16,0.3), 0 0 12px rgba(139,100,16,0.4);
+    }
+    .custom-marker.active {
+      transform: scale(1.4);
+    }
+
+    .leaflet-popup-content-wrapper {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 0; box-shadow: 0 4px 20px rgba(90,60,15,0.2);
+    }
+    .leaflet-popup-tip { background: var(--bg); }
+    .popup-year { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--gold); line-height: 1; }
+    .popup-name { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--text); letter-spacing: 0.05em; }
+    .popup-hint { font-family: 'Space Mono', monospace; font-size: 0.55rem; color: var(--text-dim); letter-spacing: 0.1em; margin-top: 4px; }
+
+    /* Pulse animation for new points */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(139,100,16,0.5); }
+      100% { box-shadow: 0 0 0 12px rgba(139,100,16,0); }
+    }
+    .custom-marker.pulse { animation: pulse 1s ease-out; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #map { right: 0; bottom: 200px; }
+      #sidebar { display: none; }
+      #timeline { height: 200px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="h-brand">Tachecí</a>
+  <span class="h-title">Mapa rodu — časová osa</span>
+  <a href="/" class="h-back">← Zpět na web</a>
+</header>
+
+<div id="map"></div>
+
+<div id="sidebar">
+  <div class="sidebar-empty" id="sidebarEmpty">
+    <div class="icon">◎</div>
+    <p>Přetáhni slider níže<br>nebo klikni na bod na mapě</p>
+  </div>
+  <div class="sidebar-content" id="sidebarContent"></div>
+</div>
+
+<div id="timeline">
+  <div class="tl-header">
+    <div class="tl-current-year" id="currentYear">~1550</div>
+    <div class="tl-info">Zobrazeno míst: <span id="visibleCount">0</span> / <span id="totalCount">0</span></div>
+  </div>
+  <div class="slider-wrap">
+    <input type="range" id="slider" min="1550" max="2026" value="1550" step="1" />
+  </div>
+  <div class="tl-ticks" id="ticks"></div>
+</div>
+
+<script>
+  // DATA
+  const places = [
+    {
+      id: 'kralovice',
+      name: 'Královice u Slaného',
+      lat: 50.2636, lng: 14.0528,
+      year: 1550,
+      yearLabel: '~1550',
+      isNew: true,
+      event: 'Tachové doloženi v Královicích',
+      note: 'Nejstarší dosud známý záznam rodu — o více než 60 let starší než prameny studované Řehákem v roce 1933.',
+      people: ['Neznámý předek rodu Tach (~1550)'],
+      origin: true
+    },
+    {
+      id: 'chvalin',
+      name: 'Chvalín u Roudnice',
+      lat: 50.3980, lng: 14.2820,
+      year: 1610,
+      yearLabel: '1610',
+      event: 'Václav Tach přijímá selský statek',
+      note: 'Nejstarší doložený předek rodu v Řehákově studii. Jméno Tach se časem zlatinizovalo na Tachetius.',
+      people: ['Václav Tach (†po 1610)'],
+      origin: true
+    },
+    {
+      id: 'brnany',
+      name: 'Brňany',
+      lat: 50.4210, lng: 14.1950,
+      year: 1675,
+      yearLabel: '1675',
+      event: 'Jiří Tach, jinak Kohel řečený, kupuje grunt',
+      note: 'Vznik dvojího příjmení Tach–Kohejl „po střeše" — jméno přešlo od předchozího majitele gruntu.',
+      people: ['Jiří Tach alias Kohel (1675)']
+    },
+    {
+      id: 'strednice',
+      name: 'Střednice',
+      lat: 50.3760, lng: 14.4150,
+      year: 1693,
+      yearLabel: '1693',
+      event: 'Karel Kohejl se přiženěním dostává do Střednic',
+      note: 'Vznik Střednicko-mělnické větve — nejpočetnější větve rodu s více než 370 zaznamenanými členy.',
+      people: ['Karel Kohejl z Brňan (1693)', 'Manželka z rodu usazených ve Střednicích']
+    },
+    {
+      id: 'dusníky',
+      name: 'Dušníky',
+      lat: 50.3580, lng: 14.4480,
+      year: 1700,
+      yearLabel: 'od 1700',
+      event: 'Rod se rozšiřuje do Dušník',
+      note: 'Dušnická větev střednicko-mělnické linie. Jedna z nejhustěji osídlených oblastí rodu.',
+      people: ['Příslušníci střednicko-dušnické větve']
+    },
+    {
+      id: 'vysoka',
+      name: 'Vysoká',
+      lat: 50.3420, lng: 14.4680,
+      year: 1708,
+      yearLabel: 'od 1708',
+      event: 'Rod přichází do Vysoké',
+      note: 'Po vydání tolerančního patentu roku 1782 se příslušníci rodu ve Vysoké přihlásili k reformovanému vyznání.',
+      people: ['Rodina Tachecí ve Vysoké (od 1708)', 'Reformovaná větev (od 1782)']
+    },
+    {
+      id: 'straznice',
+      name: 'Strážnice',
+      lat: 50.3650, lng: 14.3800,
+      year: 1740,
+      yearLabel: '18. stol.',
+      event: 'Rod přichází do Strážnice',
+      note: 'Rozšíření rodu v 18. století do okolních vesnic podél Labe.',
+      people: ['Příslušníci rodu Tachecí (18. stol.)']
+    },
+    {
+      id: 'kojetice',
+      name: 'Kojetice',
+      lat: 50.2180, lng: 14.4420,
+      year: 1760,
+      yearLabel: '18. stol.',
+      event: 'Rod přichází do Kojetic',
+      note: 'Větev rodu směřující na jih — Kojetice leží blízko Mělníka.',
+      people: ['Příslušníci rodu Tachecí (18. stol.)']
+    },
+    {
+      id: 'praha',
+      name: 'Praha a okolí',
+      lat: 50.0755, lng: 14.4378,
+      year: 1850,
+      yearLabel: '19–20. stol.',
+      event: 'Urbanizace — rod přichází do Prahy',
+      note: 'V 19. a 20. století se část rodu stěhuje do Prahy a okolí v rámci industrializace Čech.',
+      people: ['Různí příslušníci rodu (19–20. stol.)']
+    }
+  ];
+
+  const MILESTONES = [1550, 1610, 1675, 1693, 1724, 1782, 1850, 1933, 2026];
+
+  // MAP INIT
+  const map = L.map('map', {
+    center: [50.28, 14.32],
+    zoom: 10,
+    zoomControl: true,
+    attributionControl: false
+  });
+
+  // CartoDB light tiles — warm look
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© CartoDB © OpenStreetMap',
+    subdomains: 'abcd', maxZoom: 16
+  }).addTo(map);
+
+  L.control.attribution({ prefix: false, position: 'bottomleft' }).addTo(map);
+
+  // MARKERS
+  const markers = {};
+  const markerEls = {};
+
+  places.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'custom-marker' + (p.origin ? ' origin' : '');
+    el.style.display = 'none';
+
+    const icon = L.divIcon({ html: el, className: '', iconSize: [12, 12], iconAnchor: [6, 6] });
+    const marker = L.marker([p.lat, p.lng], { icon });
+
+    marker.bindPopup(`
+      <div class="popup-year">${p.yearLabel}</div>
+      <div class="popup-name">${p.name}</div>
+      <div class="popup-hint">Klikni pro více info →</div>
+    `, { closeButton: false, offset: [0, -6] });
+
+    marker.on('click', () => showSidebar(p));
+    marker.addTo(map);
+
+    markers[p.id] = marker;
+    markerEls[p.id] = el;
+  });
+
+  // TOTAL COUNT
+  document.getElementById('totalCount').textContent = places.length;
+
+  // TICKS
+  const ticksEl = document.getElementById('ticks');
+  MILESTONES.forEach(y => {
+    const t = document.createElement('span');
+    t.className = 'tl-tick';
+    t.textContent = y === 1550 ? '~1550' : y === 2026 ? 'dnes' : y;
+    t.dataset.year = y;
+    t.addEventListener('click', () => {
+      document.getElementById('slider').value = y;
+      updateMap(y);
+    });
+    ticksEl.appendChild(t);
+  });
+
+  // SIDEBAR
+  function showSidebar(p) {
+    document.getElementById('sidebarEmpty').style.display = 'none';
+    const sc = document.getElementById('sidebarContent');
+    sc.className = 'sidebar-content active';
+
+    let peopleHtml = p.people.map(person => `<div class="sc-person">${person}</div>`).join('');
+
+    sc.innerHTML = `
+      <div class="sc-year">${p.yearLabel}</div>
+      ${p.isNew ? '<span class="sc-badge">NOVÝ POZNATEK</span>' : ''}
+      <div class="sc-name">${p.name}</div>
+      <div class="sc-event">${p.event}</div>
+      <div class="sc-note">${p.note}</div>
+      <div class="sc-divider"></div>
+      <div class="sc-label">Klíčové osoby</div>
+      <div class="sc-people">${peopleHtml}</div>
+    `;
+
+    // Highlight marker
+    Object.values(markerEls).forEach(el => el.classList.remove('active'));
+    markerEls[p.id].classList.add('active');
+  }
+
+  // UPDATE MAP based on year
+  let lastVisible = new Set();
+
+  function updateMap(year) {
+    const yearInt = parseInt(year);
+    document.getElementById('currentYear').textContent =
+      yearInt <= 1550 ? '~1550' : yearInt >= 2026 ? 'dnes' : year;
+
+    // Update ticks
+    document.querySelectorAll('.tl-tick').forEach(t => {
+      t.classList.toggle('active', parseInt(t.dataset.year) <= yearInt);
+    });
+
+    let visible = 0;
+    places.forEach(p => {
+      const show = p.year <= yearInt;
+      const el = markerEls[p.id];
+      const wasVisible = lastVisible.has(p.id);
+
+      if (show) {
+        el.style.display = 'block';
+        visible++;
+        // Pulse on first appearance
+        if (!wasVisible) {
+          el.classList.add('pulse');
+          setTimeout(() => el.classList.remove('pulse'), 1000);
+          lastVisible.add(p.id);
+        }
+      } else {
+        el.style.display = 'none';
+        lastVisible.delete(p.id);
+      }
+    });
+
+    document.getElementById('visibleCount').textContent = visible;
+  }
+
+  // SLIDER
+  const slider = document.getElementById('slider');
+  slider.addEventListener('input', e => updateMap(e.target.value));
+
+  // Init
+  updateMap(1550);
+
+  // Auto-play on load
+  let autoPlay = null;
+  function startAutoPlay() {
+    let y = 1550;
+    autoPlay = setInterval(() => {
+      y += 3;
+      if (y > 2026) { clearInterval(autoPlay); return; }
+      slider.value = y;
+      updateMap(y);
+    }, 30);
+  }
+
+  // Start auto-play after 1s
+  setTimeout(startAutoPlay, 800);
+
+  // Stop on user interaction
+  slider.addEventListener('mousedown', () => { if (autoPlay) { clearInterval(autoPlay); autoPlay = null; } });
+  slider.addEventListener('touchstart', () => { if (autoPlay) { clearInterval(autoPlay); autoPlay = null; } });
+</script>
+</body>
+</html>
