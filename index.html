@@ -1,1276 +1,506 @@
 <!DOCTYPE html>
-<html lang="cs" data-theme="light">
+<html lang="cs">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rod Tachecích — Od Chvalína do světa</title>
-  <meta name="description" content="Živý rodopis rodu Tachecích. Tisíce členů, stovky let, jedna krev." />
+  <title>Rod Tachecích — Jméno tesané do času</title>
+  <meta name="description" content="Živý rodopis rodu Tachecích. Téměř 500 let, tři větve, jedna krev." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <style>
-    /* ============ VARIABLES ============ */
     :root {
-      --gold: #C9A84C;
-      --gold-light: #E8C97A;
-      --gold-dark: #8B6914;
-      --ink: #1a1410;
-      --parchment: #F5EDD8;
-      --parchment-dark: #E8D9B8;
-      --parchment-deeper: #D4C49A;
-      --cream: #FAF6EE;
-      --stone: #8A7E6E;
-      --stone-light: #B8AFA0;
-      --text: #2C2318;
-      --text-muted: #6B5E4E;
-      --border: rgba(201,168,76,0.25);
-      --shadow: rgba(44,35,24,0.12);
-      --bg: var(--cream);
-      --card-bg: var(--parchment);
-      --nav-bg: rgba(250,246,238,0.92);
-      transition: background 0.4s, color 0.4s;
+      --gold: #8B6410;
+      --gold-dim: rgba(139,100,16,0.1);
+      --gold-glow: rgba(139,100,16,0.3);
+      --ink: #f5e9c8;
+      --ink2: #ede0b0;
+      --parchment: #2a1f0e;
+      --text: #3d2e14;
+      --text-dim: #7a6540;
+      --border: rgba(139,100,16,0.2);
     }
-
-    [data-theme="dark"] {
-      --bg: #0e0c09;
-      --card-bg: #1a1610;
-      --text: #E8D9B8;
-      --text-muted: #8A7A65;
-      --border: rgba(201,168,76,0.18);
-      --shadow: rgba(0,0,0,0.4);
-      --nav-bg: rgba(14,12,9,0.92);
-      --parchment: #1a1610;
-      --stone: #6B5E4E;
-      --stone-light: #4A3E30;
-    }
-
-    /* ============ RESET & BASE ============ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; font-size: 16px; }
-
+    html { scroll-behavior: smooth; }
     body {
-      font-family: 'Crimson Pro', Georgia, serif;
-      background: var(--bg);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      background: #f5e9c8;
       color: var(--text);
-      line-height: 1.7;
       overflow-x: hidden;
-      transition: background 0.4s, color 0.4s;
+      cursor: crosshair;
     }
 
-    /* ============ SCROLLBAR ============ */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 3px; }
+    /* VIGNETTE */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(90,60,15,0.4) 100%);
+      pointer-events: none; z-index: 999;
+    }
 
-    /* ============ NAVIGATION ============ */
+    /* NOISE */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 998; opacity: 0.25;
+    }
+
+    /* CURSOR */
+    .cur { position: fixed; width: 6px; height: 6px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); }
+    .cur-ring { position: fixed; width: 28px; height: 28px; border: 1px solid var(--gold); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: all 0.15s ease; opacity: 0.45; }
+
+    /* NAV */
     nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      background: var(--nav-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 2rem;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: background 0.4s;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.3s, background 0.3s;
     }
-
-    .nav-brand {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--gold);
-      letter-spacing: 0.05em;
-      text-decoration: none;
-    }
-
-    .nav-brand span {
-      color: var(--text-muted);
-      font-weight: 300;
-      font-style: italic;
-      font-size: 0.9rem;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
+    nav.scrolled { border-color: var(--border); background: rgba(245,233,200,0.92); backdrop-filter: blur(16px); }
+    .nav-brand { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.2em; color: var(--gold); text-decoration: none; }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
     .nav-links a:hover { color: var(--gold); }
 
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+    /* NOTICE */
+    .notice {
+      margin-top: 60px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.06), transparent);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 3rem; text-align: center;
+      font-family: 'Space Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.15em; color: var(--text-dim);
     }
+    .notice strong { color: var(--gold); }
+    .notice a { color: var(--gold); text-decoration: none; }
 
-    .theme-toggle {
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 4px 12px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .theme-toggle:hover {
-      border-color: var(--gold);
-      color: var(--gold);
-    }
-
-    /* ============ HERO ============ */
+    /* HERO */
     .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 6rem 2rem 4rem;
-      position: relative;
-      overflow: hidden;
+      min-height: 100vh; position: relative;
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
     }
-
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-    }
-
-    /* Subtle grain texture */
-    .hero-bg::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      opacity: 0.4;
+    .hero::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(180,140,60,0.15) 100%);
       pointer-events: none;
     }
-
-    /* Radial gradient blobs */
-    .hero-bg::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(201,168,76,0.06) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 60% at 80% 70%, rgba(201,168,76,0.04) 0%, transparent 70%);
-      pointer-events: none;
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(139,100,16,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(139,100,16,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridDrift 35s linear infinite;
     }
+    @keyframes gridDrift { 0% { transform: translateY(0); } 100% { transform: translateY(60px); } }
 
-    [data-theme="dark"] .hero-bg::after {
-      background:
-        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(201,168,76,0.08) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 60% at 80% 70%, rgba(201,168,76,0.05) 0%, transparent 70%);
-    }
-
-    /* Decorative lines */
-    .hero-ornament {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: min(700px, 90vw);
-      height: min(700px, 90vw);
-      border: 1px solid var(--border);
-      border-radius: 50%;
-      opacity: 0.3;
-      pointer-events: none;
-    }
-
-    .hero-ornament::before {
-      content: '';
-      position: absolute;
-      inset: 40px;
-      border: 1px solid var(--border);
-      border-radius: 50%;
+    .hero-split {
+      position: absolute; top: 0; bottom: 0; left: 58%;
+      width: 1px; background: linear-gradient(to bottom, transparent, var(--gold), transparent); opacity: 0.25;
     }
 
     .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 800px;
+      position: relative; z-index: 2;
+      width: 100%; max-width: 1400px; padding: 0 3rem;
+      display: grid; grid-template-columns: 1fr auto; gap: 5rem; align-items: center;
     }
 
     .hero-eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 1.5rem;
-      opacity: 0;
-      animation: fadeUp 0.8s ease 0.2s forwards;
+      font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 2rem; opacity: 0; animation: fadeUp 1s ease 0.3s forwards;
+      display: flex; align-items: center; gap: 1rem;
     }
+    .hero-eyebrow::before { content: ''; width: 40px; height: 1px; background: var(--gold); display: inline-block; }
 
     .hero-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(3rem, 8vw, 6.5rem);
-      font-weight: 900;
-      line-height: 1.05;
-      letter-spacing: -0.02em;
-      color: var(--text);
-      margin-bottom: 1.5rem;
-      opacity: 0;
-      animation: fadeUp 0.8s ease 0.4s forwards;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4.5rem, 11vw, 10rem);
+      line-height: 0.88; letter-spacing: 0.02em;
+      margin-bottom: 0.2em; opacity: 0; animation: fadeUp 1s ease 0.5s forwards;
+    }
+    .hero-title .solid { display: block; color: var(--parchment); }
+    .hero-title .outline { display: block; -webkit-text-stroke: 1.5px var(--gold); color: transparent; }
+
+    .hero-sub {
+      font-size: 1.2rem; font-weight: 300; font-style: italic; color: var(--text-dim);
+      max-width: 460px; line-height: 1.65; margin-bottom: 3rem;
+      opacity: 0; animation: fadeUp 1s ease 0.7s forwards;
     }
 
-    .hero-title em {
-      font-style: italic;
-      color: var(--gold);
-    }
+    .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 1s ease 0.9s forwards; }
 
-    .hero-subtitle {
-      font-size: 1.3rem;
-      color: var(--text-muted);
-      font-weight: 300;
-      font-style: italic;
-      max-width: 520px;
-      margin: 0 auto 2.5rem;
-      opacity: 0;
-      animation: fadeUp 0.8s ease 0.6s forwards;
+    .btn {
+      font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 0.9rem 2.2rem; text-decoration: none; display: inline-block; transition: all 0.2s;
     }
+    .btn-gold { background: var(--gold); color: var(--ink); border: 1px solid var(--gold); }
+    .btn-gold:hover { background: transparent; color: var(--gold); transform: translateY(-2px); box-shadow: 0 8px 28px var(--gold-glow); }
+    .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid rgba(255,255,255,0.12); }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
 
     .hero-stats {
-      display: flex;
-      gap: 3rem;
-      justify-content: center;
-      margin-bottom: 3rem;
-      opacity: 0;
-      animation: fadeUp 0.8s ease 0.8s forwards;
+      display: flex; flex-direction: column; gap: 2.5rem;
+      padding-left: 3rem; border-left: 1px solid var(--border);
+      opacity: 0; animation: fadeLeft 1s ease 1.1s forwards;
     }
+    .stat { text-align: right; }
+    .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 3.2rem; color: var(--gold); line-height: 1; display: block; }
+    .stat-label { font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
 
-    .stat {
-      text-align: center;
+    .scroll-ind {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem; z-index: 2;
+      opacity: 0; animation: fadeIn 1s ease 2s forwards;
     }
+    .scroll-ind span { font-family: 'Space Mono', monospace; font-size: 0.52rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); }
+    .scroll-line { width: 1px; height: 50px; background: linear-gradient(to bottom, var(--gold), transparent); animation: sPulse 2s ease-in-out infinite; }
+    @keyframes sPulse { 0%,100% { transform: scaleY(1); opacity: 0.4; } 50% { transform: scaleY(0.6); opacity: 1; } }
 
-    .stat-number {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: var(--gold);
-      display: block;
-      line-height: 1;
+    /* MARQUEE */
+    .mq-wrap { overflow: hidden; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 0.9rem 0; background: rgba(139,100,16,0.04); }
+    .mq-track { display: flex; width: max-content; animation: mq 28s linear infinite; }
+    .mq-track span { font-family: 'Bebas Neue', sans-serif; font-size: 0.85rem; letter-spacing: 0.25em; color: var(--text-dim); padding: 0 2.5rem; white-space: nowrap; }
+    .mq-track span.g { color: var(--gold); }
+    @keyframes mq { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* SECTIONS */
+    section { padding: 8rem 3rem; }
+    .inner { max-width: 1200px; margin: 0 auto; }
+    .s-label {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 0.8rem; display: flex; align-items: center; gap: 1rem;
     }
+    .s-label::after { content: ''; flex: 1; height: 1px; background: var(--border); max-width: 80px; }
+    .s-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.8rem, 5.5vw, 5rem); line-height: 0.95; letter-spacing: 0.03em; color: var(--parchment); margin-bottom: 1.5rem; }
 
-    .stat-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      display: block;
-      margin-top: 4px;
-    }
-
-    .hero-cta {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      opacity: 0;
-      animation: fadeUp 0.8s ease 1s forwards;
-    }
-
-    .btn-primary {
-      background: var(--gold);
-      color: var(--ink);
-      padding: 0.8rem 2rem;
-      border-radius: 2px;
-      text-decoration: none;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      font-weight: 400;
-      transition: all 0.2s;
-      border: 1px solid var(--gold);
-    }
-
-    .btn-primary:hover {
-      background: var(--gold-light);
-      border-color: var(--gold-light);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 20px rgba(201,168,76,0.3);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--text);
-      padding: 0.8rem 2rem;
-      border-radius: 2px;
-      text-decoration: none;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      border: 1px solid var(--border);
-      transition: all 0.2s;
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--gold);
-      color: var(--gold);
-      transform: translateY(-1px);
-    }
-
-    .scroll-hint {
-      position: absolute;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      opacity: 0;
-      animation: fadeIn 1s ease 2s forwards;
-      z-index: 1;
-    }
-
-    .scroll-hint span {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--stone-light);
-    }
-
-    .scroll-arrow {
-      width: 1px;
-      height: 40px;
-      background: linear-gradient(to bottom, var(--gold), transparent);
-      animation: scrollPulse 2s ease-in-out infinite;
-    }
-
-    /* ============ DIVIDER ============ */
-    .section-divider {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .section-divider::before,
-    .section-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    .divider-ornament {
-      color: var(--gold);
-      font-size: 1rem;
-    }
-
-    /* ============ SECTIONS ============ */
-    section {
-      padding: 6rem 2rem;
-    }
-
-    .section-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .section-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 0.75rem;
-    }
-
-    .section-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 700;
-      line-height: 1.2;
-      color: var(--text);
-      margin-bottom: 1rem;
-    }
-
-    .section-lead {
-      font-size: 1.2rem;
-      color: var(--text-muted);
-      font-style: italic;
-      max-width: 600px;
-      margin-bottom: 3rem;
-    }
-
-    /* ============ STORY SECTION ============ */
-    .story-section {
-      background: var(--card-bg);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .story-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 5rem;
-      align-items: center;
-    }
-
-    .story-text p {
-      font-size: 1.15rem;
-      color: var(--text);
-      margin-bottom: 1.2rem;
-      line-height: 1.8;
-    }
-
+    /* STORY */
+    .story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start; }
+    .story-text p { font-size: 1.15rem; line-height: 1.85; color: var(--text); margin-bottom: 1.4rem; font-weight: 300; }
+    .story-text p strong { color: var(--gold); font-weight: 600; }
     .story-text p:first-of-type::first-letter {
-      font-family: 'Playfair Display', serif;
-      font-size: 3.5rem;
-      font-weight: 900;
-      color: var(--gold);
-      float: left;
-      line-height: 0.8;
-      margin-right: 8px;
-      margin-top: 6px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 4.5rem; color: var(--gold);
+      float: left; line-height: 0.72; margin-right: 10px; margin-top: 10px;
     }
 
-    .story-visual {
-      position: relative;
+    .locs-panel { background: #ede0b0; border: 1px solid var(--border); position: sticky; top: 100px; }
+    .locs-head { padding: 1.3rem 2rem; border-bottom: 1px solid var(--border); font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+    .loc { display: flex; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid rgba(139,100,16,0.1); transition: background 0.2s; }
+    .loc:last-child { border-bottom: none; }
+    .loc:hover { background: rgba(139,100,16,0.08); }
+    .loc-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); margin-right: 1.2rem; flex-shrink: 0; }
+    .loc.first .loc-dot { box-shadow: 0 0 8px var(--gold-glow); }
+    .loc-name { font-size: 1.05rem; color: var(--text); flex: 1; }
+    .loc-yr { font-family: 'Space Mono', monospace; font-size: 0.58rem; color: var(--text-dim); letter-spacing: 0.08em; }
+    .loc-badge { font-family: 'Space Mono', monospace; font-size: 0.47rem; background: var(--gold); color: var(--ink); padding: 2px 5px; margin-right: 0.5rem; }
+
+    /* TIMELINE */
+    .tl-section { background: #ede0b0; border-top: 1px solid var(--border); }
+    .tl-inner { display: grid; grid-template-columns: 1fr 2fr; gap: 6rem; align-items: start; }
+    .tl-sticky { position: sticky; top: 120px; }
+    .tl-sticky p { font-size: 1.1rem; font-weight: 300; color: var(--text-dim); line-height: 1.7; margin-top: 1rem; }
+
+    .tl { position: relative; padding-left: 3rem; }
+    .tl::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: linear-gradient(to bottom, transparent, var(--gold) 10%, var(--gold) 90%, transparent); opacity: 0.35; }
+    .tl-item { position: relative; padding-bottom: 2.8rem; opacity: 0; transform: translateX(-20px); transition: opacity 0.6s, transform 0.6s; }
+    .tl-item.vis { opacity: 1; transform: translateX(0); }
+    .tl-item::before { content: ''; position: absolute; left: -3rem; top: 7px; width: 9px; height: 9px; border-radius: 50%; background: #ede0b0; border: 1px solid var(--gold); transition: background 0.3s; }
+    .tl-item:hover::before { background: var(--gold); }
+    .tl-yr { font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem; color: var(--gold); letter-spacing: 0.05em; line-height: 1; margin-bottom: 0.25rem; }
+    .tl-ev { font-size: 1.1rem; color: var(--text); line-height: 1.5; margin-bottom: 0.25rem; }
+    .tl-note { font-size: 0.92rem; font-style: italic; color: var(--text-dim); }
+    .tl-badge { display: inline-block; font-family: 'Space Mono', monospace; font-size: 0.48rem; letter-spacing: 0.08em; background: var(--gold); color: var(--ink); padding: 2px 7px; margin-left: 0.4rem; vertical-align: middle; }
+
+    /* FEATURES */
+    .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+    .feat { background: #f5e9c8; padding: 3rem 2.5rem; position: relative; overflow: hidden; transition: background 0.3s; }
+    .feat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
+    .feat:hover { background: #ede0b0; }
+    .feat:hover::before { transform: scaleX(1); }
+    .feat-num { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; color: rgba(201,168,76,0.1); line-height: 1; margin-bottom: 1rem; transition: color 0.3s; }
+    .feat:hover .feat-num { color: rgba(201,168,76,0.18); }
+    .feat-title { font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; font-weight: 600; color: var(--parchment); margin-bottom: 0.7rem; }
+    .feat-desc { font-size: 0.98rem; color: var(--text-dim); line-height: 1.6; }
+    .feat-arr { display: inline-block; font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-top: 1.5rem; opacity: 0; transform: translateX(-8px); transition: opacity 0.3s, transform 0.3s; }
+    .feat:hover .feat-arr { opacity: 1; transform: translateX(0); }
+
+    /* COMMUNITY */
+    .comm-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start; }
+    .form-field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.1rem; }
+    .form-field label { font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); }
+    .form-field input, .form-field textarea, .form-field select {
+      background: #f5e9c8; border: 1px solid var(--border); padding: 0.85rem 1.1rem;
+      font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: var(--text);
+      outline: none; transition: border-color 0.2s; -webkit-appearance: none;
     }
+    .form-field input:focus, .form-field textarea:focus, .form-field select:focus { border-color: var(--gold); }
+    .form-field select option { background: #f5e9c8; }
+    .form-field textarea { min-height: 120px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .comm-right { padding-top: 0.5rem; }
+    .comm-right h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.05em; color: var(--parchment); margin-bottom: 1rem; }
+    .comm-right p { font-size: 1.05rem; font-weight: 300; color: var(--text-dim); line-height: 1.7; margin-bottom: 1rem; }
+    .benefit-list { list-style: none; margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.7rem; }
+    .benefit-list li { display: flex; gap: 0.8rem; font-size: 0.98rem; color: var(--text-dim); align-items: flex-start; }
+    .benefit-list li::before { content: '→'; color: var(--gold); font-family: 'Space Mono', monospace; flex-shrink: 0; font-size: 0.8rem; }
+    .q-block { margin-top: 2.5rem; padding: 1.5rem 2rem; border-left: 2px solid var(--gold); background: rgba(139,100,16,0.06); }
+    .q-block blockquote { font-size: 1.05rem; font-style: italic; color: var(--text-dim); line-height: 1.7; margin-bottom: 0.6rem; }
+    .q-block cite { font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.1em; color: var(--gold); }
 
-    .map-placeholder {
-      background: var(--parchment-dark, #E8D9B8);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 2rem;
-      min-height: 380px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
+    /* FOOTER */
+    footer { padding: 2.5rem 3rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .foot-brand { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.15em; color: var(--gold); }
+    .foot-center { font-style: italic; font-size: 0.95rem; color: var(--text-dim); }
+    .foot-right { font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.08em; color: var(--text-dim); text-align: right; line-height: 1.8; }
+    .foot-right a { color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
+    .foot-right a:hover { color: var(--gold); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeLeft { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .reveal.vis { opacity: 1; transform: translateY(0); }
+    .rd1 { transition-delay: 0.1s; } .rd2 { transition-delay: 0.2s; } .rd3 { transition-delay: 0.3s; } .rd4 { transition-delay: 0.4s; }
+
+    @media (max-width: 960px) {
+      .hero-content { grid-template-columns: 1fr; }
+      .hero-stats { flex-direction: row; border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 2rem; }
+      .story-grid, .tl-inner, .comm-wrap { grid-template-columns: 1fr; gap: 3rem; }
+      .feat-grid { grid-template-columns: 1fr; }
+      .tl-sticky { position: static; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; }
+      .foot-right { text-align: center; }
+      nav { padding: 1rem 1.5rem; }
     }
-
-    [data-theme="dark"] .map-placeholder {
-      background: #211d15;
-    }
-
-    .map-placeholder-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
-      color: var(--gold);
-      margin-bottom: 1rem;
-      font-style: italic;
-    }
-
-    /* SVG mini-map of Bohemia with dots */
-    .locations-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      width: 100%;
-    }
-
-    .location-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 1rem;
-      color: var(--text-muted);
-    }
-
-    .location-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--gold);
-      flex-shrink: 0;
-    }
-
-    .location-item.origin .location-dot {
-      background: var(--gold);
-      box-shadow: 0 0 0 3px rgba(201,168,76,0.2);
-    }
-
-    .location-year {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--stone-light);
-      margin-left: auto;
-    }
-
-    /* ============ FEATURES GRID ============ */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .feature-card {
-      background: var(--bg);
-      padding: 2.5rem 2rem;
-      text-decoration: none;
-      color: inherit;
-      transition: background 0.2s;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .feature-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--gold);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.3s ease;
-    }
-
-    .feature-card:hover { background: var(--card-bg); }
-    .feature-card:hover::before { transform: scaleX(1); }
-
-    .feature-icon {
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
-      display: block;
-    }
-
-    .feature-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 0.5rem;
-    }
-
-    .feature-desc {
-      font-size: 1rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-
-    .feature-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-top: 1rem;
-      text-decoration: none;
-    }
-
-    .feature-link::after {
-      content: '→';
-      transition: transform 0.2s;
-    }
-
-    .feature-card:hover .feature-link::after {
-      transform: translateX(4px);
-    }
-
-    /* ============ TIMELINE ============ */
-    .timeline {
-      position: relative;
-      padding-left: 2rem;
-    }
-
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 1px;
-      background: linear-gradient(to bottom, transparent, var(--gold), var(--gold), transparent);
-    }
-
-    .timeline-item {
-      position: relative;
-      padding-bottom: 2.5rem;
-      padding-left: 1.5rem;
-      opacity: 0;
-      transform: translateX(-10px);
-      transition: opacity 0.5s, transform 0.5s;
-    }
-
-    .timeline-item.visible {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .timeline-item::before {
-      content: '';
-      position: absolute;
-      left: -2rem;
-      top: 8px;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--gold);
-      border: 2px solid var(--bg);
-    }
-
-    .timeline-year {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      color: var(--gold);
-      margin-bottom: 0.25rem;
-    }
-
-    .timeline-text {
-      font-size: 1.05rem;
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    .timeline-subtext {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      font-style: italic;
-      margin-top: 0.2rem;
-    }
-
-    /* ============ COMMUNITY SECTION ============ */
-    .community-section {
-      background: var(--card-bg);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .community-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: start;
-    }
-
-    .contact-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-
-    .form-group label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      padding: 0.75rem 1rem;
-      font-family: 'Crimson Pro', serif;
-      font-size: 1rem;
-      color: var(--text);
-      transition: border-color 0.2s;
-      outline: none;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
-      border-color: var(--gold);
-    }
-
-    .form-group textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-
-    .form-submit {
-      margin-top: 0.5rem;
-    }
-
-    .community-info h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      color: var(--text);
-      margin-bottom: 1rem;
-    }
-
-    .community-info p {
-      font-size: 1.05rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-      margin-bottom: 1rem;
-    }
-
-    .info-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-top: 1.5rem;
-    }
-
-    .info-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      font-size: 1rem;
-      color: var(--text-muted);
-    }
-
-    .info-list li::before {
-      content: '◆';
-      color: var(--gold);
-      font-size: 0.5rem;
-      margin-top: 0.5rem;
-      flex-shrink: 0;
-    }
-
-    /* ============ FOOTER ============ */
-    footer {
-      padding: 3rem 2rem;
-      border-top: 1px solid var(--border);
-      text-align: center;
-    }
-
-    .footer-brand {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--gold);
-      margin-bottom: 0.5rem;
-    }
-
-    .footer-quote {
-      font-style: italic;
-      color: var(--text-muted);
-      font-size: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .footer-meta {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
-      color: var(--stone-light);
-    }
-
-    .footer-meta a {
-      color: var(--stone-light);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .footer-meta a:hover { color: var(--gold); }
-
-    /* ============ ANIMATIONS ============ */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes scrollPulse {
-      0%, 100% { opacity: 0.3; transform: scaleY(1); }
-      50% { opacity: 1; transform: scaleY(0.8); }
-    }
-
-    /* Scroll reveal */
-    .reveal {
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
-    .reveal-delay-4 { transition-delay: 0.4s; }
-    .reveal-delay-5 { transition-delay: 0.5s; }
-
-    /* ============ RESPONSIVE ============ */
-    @media (max-width: 900px) {
-      .story-grid,
-      .community-grid { grid-template-columns: 1fr; gap: 3rem; }
-
-      .features-grid { grid-template-columns: 1fr 1fr; }
-
-      .hero-stats { gap: 2rem; }
-
-      .nav-links { display: none; }
-    }
-
     @media (max-width: 600px) {
-      .features-grid { grid-template-columns: 1fr; }
+      section { padding: 5rem 1.5rem; }
+      .hero-title { font-size: clamp(3.5rem, 16vw, 6rem); }
       .form-row { grid-template-columns: 1fr; }
-      .hero-stats { gap: 1.5rem; }
-      .stat-number { font-size: 1.8rem; }
     }
-
-    /* ============ NOTICE BANNER ============ */
-    .notice-banner {
-      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.08), transparent);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 0.6rem 2rem;
-      text-align: center;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-    }
-
-    .notice-banner strong { color: var(--gold); }
-
   </style>
 </head>
 <body>
 
-  <!-- NAVIGATION -->
-  <nav>
-    <a href="/" class="nav-brand">Tachecí <span>— rod</span></a>
-    <ul class="nav-links">
-      <li><a href="#pribeh">Příběh</a></li>
-      <li><a href="#archiv">Archiv</a></li>
-      <li><a href="#rodokmen">Rodokmen</a></li>
-      <li><a href="#komunita">Komunita</a></li>
-    </ul>
-    <div class="nav-right">
-      <button class="theme-toggle" id="themeToggle" aria-label="Přepnout téma">
-        <span id="themeIcon">☽</span>
-        <span id="themeLabel">Noc</span>
-      </button>
-    </div>
-  </nav>
+<div class="cur" id="cur"></div>
+<div class="cur-ring" id="curRing"></div>
 
-  <!-- NOTICE -->
-  <div class="notice-banner" style="margin-top:60px">
-    <strong>Web se buduje.</strong> Máš v rodu Tachecí? <a href="#komunita" style="color:var(--gold);text-decoration:none">Přihlas se →</a>
-  </div>
+<nav id="nav">
+  <a href="/" class="nav-brand">Tachecí</a>
+  <ul class="nav-links">
+    <li><a href="#puvod">Původ</a></li>
+    <li><a href="#kronika">Kronika</a></li>
+    <li><a href="#archiv">Archiv</a></li>
+    <li><a href="#komunita">Komunita</a></li>
+  </ul>
+</nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-bg">
-      <div class="hero-ornament"></div>
-    </div>
-    <div class="hero-content">
-      <p class="hero-eyebrow">Rod Tachecích — od roku 1610</p>
+<div class="notice">
+  <strong>Web se buduje.</strong> Jsi Tachecí? <a href="#komunita">Přihlas se →</a>
+</div>
+
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-split"></div>
+  <div class="hero-content">
+    <div>
+      <p class="hero-eyebrow">Rod Tachecích — živý rodopis</p>
       <h1 class="hero-title">
-        Jméno tesané<br><em>do času</em>
+        <span class="solid">Jméno</span>
+        <span class="outline">tesané</span>
+        <span class="solid">do času</span>
       </h1>
-      <p class="hero-subtitle">
-        Starý selský rod z Chvalína u Roudnice. Přes tři sta let, tři větve, šest set zaznamenaných členů — a stále žijící.
-      </p>
-      <div class="hero-stats">
-        <div class="stat">
-          <span class="stat-number">600+</span>
-          <span class="stat-label">Zaznamenaných členů</span>
-        </div>
-        <div class="stat">
-          <span class="stat-number">~1550</span>
-          <span class="stat-label">Nejstarší doklad</span>
-        </div>
-        <div class="stat">
-          <span class="stat-number">3</span>
-          <span class="stat-label">Hlavní větve</span>
-        </div>
-        <div class="stat">
-          <span class="stat-number">XII</span>
-          <span class="stat-label">Generací</span>
-        </div>
-      </div>
+      <p class="hero-sub">Starý selský rod z Čech. Téměř 500 let, tři větve, šest set zaznamenaných jmen — a stále žijící.</p>
       <div class="hero-cta">
-        <a href="#pribeh" class="btn-primary">Číst příběh rodu</a>
-        <a href="#komunita" class="btn-secondary">Jsem Tachecí</a>
+        <a href="#puvod" class="btn btn-gold">Číst příběh</a>
+        <a href="#komunita" class="btn btn-ghost">Jsem Tachecí</a>
       </div>
     </div>
-    <div class="scroll-hint">
-      <span>Scrollovat</span>
-      <div class="scroll-arrow"></div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">600+</span><span class="stat-label">Zaznamenaných členů</span></div>
+      <div class="stat"><span class="stat-num">~1550</span><span class="stat-label">Nejstarší doklad</span></div>
+      <div class="stat"><span class="stat-num">III</span><span class="stat-label">Hlavní větve</span></div>
+      <div class="stat"><span class="stat-num">XII</span><span class="stat-label">Generací</span></div>
     </div>
-  </section>
-
-  <!-- STORY -->
-  <section class="story-section" id="pribeh">
-    <div class="section-inner">
-      <div class="story-grid">
-        <div class="story-text reveal">
-          <p class="section-label">Původ rodu</p>
-          <h2 class="section-title">Z Chvalína<br>do celého světa</h2>
-          <p>
-            Nejstarší stopy rodu vedou do <strong>Královic u Slaného</strong>, kde jsou Tachové dohledatelní již kolem roku <strong>1550</strong> — o šedesát let dříve, než zachytily prameny studované rodopiscem Řehákem. Tento poznatek přesahuje vše, co bylo o rodu dosud publikováno.
-          </p>
-          <p>
-            Za první bezpečně doloženou větev rodu se tradičně považuje <strong>Chvalín u Roudnice nad Labem</strong>, kde v roce 1610 přijal selský statek Václav Tach. Jeho jméno se postupem generací zlatinizovalo na <em>Tachetius</em> — a z odvrženého latinského zakončení vzniklo dnešní <strong>Tachecí</strong>.
-          </p>
-          <p>
-            Ze tří synů zakladatele vyrůstají tři větve: <strong>Střednicko-mělnická</strong>, <strong>Brňanská</strong> a <strong>Chvalínská</strong>. Rod se šíří po středních Čechách, pak po celé zemi — a dnes jeho potomci žijí v Čechách, na Moravě, v Rakousku, Německu, Švýcarsku i v Americe.
-          </p>
-          <p>
-            Po vydání tolerančního patentu se příslušníci rodu ve Vysoké přihlásili k reformovanému vyznání. Jméno Kohejl — starší příjmí téhož rodu — přežívalo v ústech místních přes tři sta let.
-          </p>
-          <a href="#" class="feature-link" style="margin-top:1.5rem">Číst celý příběh</a>
-        </div>
-        <div class="story-visual reveal reveal-delay-2">
-          <div class="map-placeholder">
-            <p class="map-placeholder-title">Místa rodu Tachecích</p>
-            <div class="locations-list">
-              <div class="location-item origin">
-                <div class="location-dot"></div>
-                <span>Královice u Slaného</span>
-                <span class="location-year">~1550 ✦</span>
-              </div>
-              <div class="location-item origin">
-                <div class="location-dot"></div>
-                <span>Chvalín u Roudnice</span>
-                <span class="location-year">od 1610</span>
-              </div>
-              <div class="location-item">
-                <div class="location-dot"></div>
-                <span>Brňany</span>
-                <span class="location-year">od 1675</span>
-              </div>
-              <div class="location-item">
-                <div class="location-dot"></div>
-                <span>Střednice</span>
-                <span class="location-year">od 1693</span>
-              </div>
-              <div class="location-item">
-                <div class="location-dot"></div>
-                <span>Dušníky</span>
-                <span class="location-year">od 1700</span>
-              </div>
-              <div class="location-item">
-                <div class="location-dot"></div>
-                <span>Vysoká</span>
-                <span class="location-year">od 1708</span>
-              </div>
-              <div class="location-item">
-                <div class="location-dot"></div>
-                <span>Strážnice</span>
-                <span class="location-year">18. stol.</span>
-              </div>
-              <div class="location-item">
-                <div class="location-dot"></div>
-                <span>Kojetice</span>
-                <span class="location-year">18. stol.</span>
-              </div>
-              <div class="location-item">
-                <div class="location-dot"></div>
-                <span>Praha a okolí</span>
-                <span class="location-year">19–20. stol.</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="section-divider" style="padding-top:0.1px">
-    <span class="divider-ornament">✦</span>
   </div>
+  <div class="scroll-ind">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
 
-  <!-- FEATURES -->
-  <section id="archiv">
-    <div class="section-inner">
-      <div class="reveal" style="margin-bottom:3rem">
-        <p class="section-label">Co tu najdeš</p>
-        <h2 class="section-title">Živý rodopis</h2>
-        <p class="section-lead">Nejen archiv — místo kde se minulost potkává s přítomností.</p>
+<div class="mq-wrap">
+  <div class="mq-track">
+    <span>Královice</span><span class="g">✦</span><span>Chvalín</span><span class="g">✦</span><span>Brňany</span><span class="g">✦</span><span>Střednice</span><span class="g">✦</span><span>Dušníky</span><span class="g">✦</span><span>Vysoká</span><span class="g">✦</span><span>Strážnice</span><span class="g">✦</span><span>Praha</span><span class="g">✦</span><span>Tach — Kohejl — Tachecí</span><span class="g">✦</span>
+    <span>Královice</span><span class="g">✦</span><span>Chvalín</span><span class="g">✦</span><span>Brňany</span><span class="g">✦</span><span>Střednice</span><span class="g">✦</span><span>Dušníky</span><span class="g">✦</span><span>Vysoká</span><span class="g">✦</span><span>Strážnice</span><span class="g">✦</span><span>Praha</span><span class="g">✦</span><span>Tach — Kohejl — Tachecí</span><span class="g">✦</span>
+  </div>
+</div>
+
+<section id="puvod">
+  <div class="inner">
+    <div class="story-grid">
+      <div class="story-text reveal">
+        <p class="s-label">Původ rodu</p>
+        <h2 class="s-title">Z Chvalína<br>do celého světa</h2>
+        <p>Nejstarší stopy rodu vedou do <strong>Královic u Slaného</strong>, kde jsou Tachové doloženi již kolem roku <strong>1550</strong> — o více než šedesát let dříve, než zachytily prameny studované rodopiscem Řehákem. Tento poznatek přesahuje vše, co bylo o rodu dosud publikováno.</p>
+        <p>Za první bezpečně doloženou větev se tradičně považuje <strong>Chvalín u Roudnice nad Labem</strong>, kde v roce <strong>1610</strong> přijal selský statek Václav Tach. Jeho jméno se postupem generací zlatinizovalo na <em>Tachetius</em> — a z odvrženého latinského zakončení vzniklo dnešní <strong>Tachecí</strong>.</p>
+        <p>Ze tří synů zakladatele vyrůstají tři větve: <strong>Střednicko-mělnická</strong>, <strong>Brňanská</strong> a <strong>Chvalínská</strong>. Dnes potomci žijí v Čechách, na Moravě, v Rakousku, Německu, Švýcarsku i v zámoří.</p>
+        <p>Po vydání tolerančního patentu roku 1782 se příslušníci rodu ve Vysoké přihlásili k reformovanému vyznání. Jméno Kohejl — starší příjmí téhož rodu — přežívalo v ústech místních přes tři sta let.</p>
       </div>
-
-      <div class="features-grid">
-        <div class="feature-card reveal reveal-delay-1">
-          <span class="feature-icon">📜</span>
-          <h3 class="feature-title">Archiv a dokumenty</h3>
-          <p class="feature-desc">Naskenované matriky, historické články, rodopisné studie. Vše co o Tachecích bylo napsáno — na jednom místě.</p>
-          <span class="feature-link">Procházet archiv</span>
-        </div>
-        <div class="feature-card reveal reveal-delay-2">
-          <span class="feature-icon">🌳</span>
-          <h3 class="feature-title">Interaktivní rodokmen</h3>
-          <p class="feature-desc">Vizuální strom přes dvanáct generací. Hledej své předky, sleduj jak se větve rodu šířily po Čechách i světě.</p>
-          <span class="feature-link">Otevřít rodokmen</span>
-        </div>
-        <div class="feature-card reveal reveal-delay-3">
-          <span class="feature-icon">🗺️</span>
-          <h3 class="feature-title">Mapa míst</h3>
-          <p class="feature-desc">Kde Tachecí žili, pracovali, byli pochováni. Interaktivní mapa s příběhy míst a historickými fotografiemi.</p>
-          <span class="feature-link">Zobrazit mapu</span>
-        </div>
-        <div class="feature-card reveal reveal-delay-1">
-          <span class="feature-icon">💬</span>
-          <h3 class="feature-title">Nástěnka rodu</h3>
-          <p class="feature-desc">Příbuzní si píší, sdílí vzpomínky a fotografie, hlásí nové poznatky. Živá komunita rozptýlená po světě.</p>
-          <span class="feature-link">Přejít na nástěnku</span>
-        </div>
-        <div class="feature-card reveal reveal-delay-2">
-          <span class="feature-icon">🔍</span>
-          <h3 class="feature-title">Hledám příbuzné</h3>
-          <p class="feature-desc">Hledáš někoho v rodu? Máš nové informace? Přidej svůj dotaz — jiní členové rodu ti možná odpoví.</p>
-          <span class="feature-link">Vyhledat</span>
-        </div>
-        <div class="feature-card reveal reveal-delay-3">
-          <span class="feature-icon">✉️</span>
-          <h3 class="feature-title">Přidat se</h3>
-          <p class="feature-desc">Jsi Tachecí nebo máš Tachecí v rodu? Přihlas se, doplň informace, přispěj fotografiemi nebo vzpomínkami.</p>
-          <span class="feature-link">Přihlásit se</span>
+      <div class="reveal rd2">
+        <div class="locs-panel">
+          <div class="locs-head">Místa rodu</div>
+          <div class="loc first"><div class="loc-dot"></div><span class="loc-name">Královice u Slaného</span><span class="loc-badge">NOVÝ</span><span class="loc-yr">~1550</span></div>
+          <div class="loc"><div class="loc-dot"></div><span class="loc-name">Chvalín u Roudnice</span><span class="loc-yr">od 1610</span></div>
+          <div class="loc"><div class="loc-dot"></div><span class="loc-name">Brňany</span><span class="loc-yr">od 1675</span></div>
+          <div class="loc"><div class="loc-dot"></div><span class="loc-name">Střednice</span><span class="loc-yr">od 1693</span></div>
+          <div class="loc"><div class="loc-dot"></div><span class="loc-name">Dušníky</span><span class="loc-yr">od 1700</span></div>
+          <div class="loc"><div class="loc-dot"></div><span class="loc-name">Vysoká</span><span class="loc-yr">od 1708</span></div>
+          <div class="loc"><div class="loc-dot"></div><span class="loc-name">Strážnice</span><span class="loc-yr">18. stol.</span></div>
+          <div class="loc"><div class="loc-dot"></div><span class="loc-name">Kojetice</span><span class="loc-yr">18. stol.</span></div>
+          <div class="loc"><div class="loc-dot"></div><span class="loc-name">Praha a okolí</span><span class="loc-yr">19–20. stol.</span></div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <div class="section-divider"><span class="divider-ornament">✦</span></div>
+<section class="tl-section" id="kronika">
+  <div class="inner">
+    <div class="tl-inner">
+      <div class="tl-sticky reveal">
+        <p class="s-label">Kronika</p>
+        <h2 class="s-title">Téměř<br>500 let<br>jednoho rodu</h2>
+        <p>Vybrané mezníky ze života Tachecích — od první zmínky v 16. století po současnost.</p>
+      </div>
+      <div class="tl">
+        <div class="tl-item"><div class="tl-yr">~1550 <span class="tl-badge">NOVÝ POZNATEK</span></div><div class="tl-ev">Tachové doloženi v Královicích u Slaného</div><div class="tl-note">Nejstarší dosud známý záznam — přesahuje Řehákův výzkum z r. 1933</div></div>
+        <div class="tl-item"><div class="tl-yr">1610</div><div class="tl-ev">Václav Tach přijímá statek ve Chvalíně</div><div class="tl-note">Nejstarší doložený předek v Řehákově studii</div></div>
+        <div class="tl-item"><div class="tl-yr">1675</div><div class="tl-ev">Jiří Tach, jinak Kohel řečený, kupuje grunt v Brňanech</div><div class="tl-note">Vznik dvojího jména Tach–Kohejl „po střeše"</div></div>
+        <div class="tl-item"><div class="tl-yr">1693</div><div class="tl-ev">Karel Kohejl se přiženěním dostává do Střednic</div><div class="tl-note">Vznik Střednicko-mělnické větve</div></div>
+        <div class="tl-item"><div class="tl-yr">~1724</div><div class="tl-ev">Farář Václav Tach latinizuje jméno na Tachetius</div><div class="tl-note">Odtud dnešní podoba příjmení Tachecí</div></div>
+        <div class="tl-item"><div class="tl-yr">1782</div><div class="tl-ev">Toleranční patent — rod se hlásí k reformaci</div><div class="tl-note">Ve Vysoké a okolí</div></div>
+        <div class="tl-item"><div class="tl-yr">1933</div><div class="tl-ev">Dr. Josef Řehák publikuje rodopisnou studii</div><div class="tl-note">Časopis Rodopisné společnosti čsl. v Praze — 370+ členů zmapováno</div></div>
+        <div class="tl-item"><div class="tl-yr">dnes</div><div class="tl-ev">Rod žije — v Čechách, Evropě i zámoří</div><div class="tl-note">Přes 600 zaznamenaných členů, příběh pokračuje</div></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <!-- TIMELINE -->
-  <section id="rodokmen">
-    <div class="section-inner">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start">
-        <div class="reveal">
-          <p class="section-label">Klíčové okamžiky</p>
-          <h2 class="section-title">Tři sta let<br>jednoho rodu</h2>
-          <p class="section-lead">Vybrané mezníky ze života Tachecích.</p>
-        </div>
-        <div class="timeline">
-          <div class="timeline-item">
-            <div class="timeline-year">~1550 <span style="background:var(--gold);color:var(--ink);font-size:0.58rem;padding:1px 6px;border-radius:2px;letter-spacing:0.05em;vertical-align:middle">NOVÝ POZNATEK</span></div>
-            <div class="timeline-text">Tachové doloženi v Královicích u Slaného</div>
-            <div class="timeline-subtext">Nejstarší dosud známý záznam rodu — přesahuje Řehákův výzkum z r. 1933</div>
+<section id="archiv">
+  <div class="inner">
+    <div class="reveal" style="margin-bottom:4rem">
+      <p class="s-label">Co tu najdeš</p>
+      <h2 class="s-title">Živý rodopis</h2>
+    </div>
+    <div class="feat-grid">
+      <div class="feat reveal rd1"><div class="feat-num">01</div><div class="feat-title">Archiv a dokumenty</div><div class="feat-desc">Naskenované matriky, historické články, rodopisné studie. Vše co o Tachecích bylo napsáno — na jednom místě.</div><div class="feat-arr">Procházet archiv →</div></div>
+      <div class="feat reveal rd2"><div class="feat-num">02</div><div class="feat-title">Interaktivní rodokmen</div><div class="feat-desc">Vizuální strom přes dvanáct generací. Hledej své předky, sleduj jak se větve rodu šířily po Čechách i světě.</div><div class="feat-arr">Otevřít rodokmen →</div></div>
+      <div class="feat reveal rd3"><div class="feat-num">03</div><div class="feat-title">Mapa míst</div><div class="feat-desc">Kde Tachecí žili, pracovali, byli pochováni. Interaktivní mapa s příběhy míst a historickými fotografiemi.</div><div class="feat-arr">Zobrazit mapu →</div></div>
+      <div class="feat reveal rd1"><div class="feat-num">04</div><div class="feat-title">Nástěnka rodu</div><div class="feat-desc">Příbuzní si píší, sdílí vzpomínky a fotografie, hlásí nové poznatky. Živá komunita rozptýlená po světě.</div><div class="feat-arr">Přejít na nástěnku →</div></div>
+      <div class="feat reveal rd2"><div class="feat-num">05</div><div class="feat-title">Hledám příbuzné</div><div class="feat-desc">Hledáš někoho v rodu? Máš nové informace? Přidej svůj dotaz — jiní členové rodu ti možná odpoví.</div><div class="feat-arr">Vyhledat →</div></div>
+      <div class="feat reveal rd3"><div class="feat-num">06</div><div class="feat-title">Přidat se</div><div class="feat-desc">Jsi Tachecí nebo máš Tachecí v rodu? Přihlas se, doplň informace, přispěj fotografiemi nebo vzpomínkami.</div><div class="feat-arr">Přihlásit se →</div></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#ede0b0;border-top:1px solid var(--border)" id="komunita">
+  <div class="inner">
+    <div class="comm-wrap">
+      <div class="reveal">
+        <p class="s-label">Komunita</p>
+        <h2 class="s-title">Jsi<br>Tachecí?</h2>
+        <form id="form">
+          <div class="form-row">
+            <div class="form-field"><label>Jméno</label><input type="text" placeholder="Jan" /></div>
+            <div class="form-field"><label>Příjmení</label><input type="text" placeholder="Tachecí" /></div>
           </div>
-          <div class="timeline-item">
-            <div class="timeline-year">1610</div>
-            <div class="timeline-text">Václav Tach přijímá statek ve Chvalíně</div>
-            <div class="timeline-subtext">Nejstarší doložený předek rodu v Řehákově studii</div>
+          <div class="form-field"><label>E-mail</label><input type="email" placeholder="jan@example.cz" /></div>
+          <div class="form-field">
+            <label>Vazba na rod</label>
+            <select>
+              <option value="">— vyber —</option>
+              <option>Příjmení Tachecí je moje rodné</option>
+              <option>Tachecí je v rodu po matce / babičce</option>
+              <option>Jsem potomek příbuzné rodiny</option>
+              <option>Bádám, zajímám se o genealogii</option>
+              <option>Jiné</option>
+            </select>
           </div>
-          <div class="timeline-item">
-            <div class="timeline-year">1675</div>
-            <div class="timeline-text">Jiří Tach, jinak Kohel řečený, kupuje grunt v Brňanech</div>
-            <div class="timeline-subtext">Vznik dvojího jména Tach-Kohejl</div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-year">1693</div>
-            <div class="timeline-text">Karel Kohejl z Brňan se přiženěním dostává do Střednic</div>
-            <div class="timeline-subtext">Vznik Střednicko-mělnické větve</div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-year">~1724</div>
-            <div class="timeline-text">Farář Václav Tach latinizuje jméno na <em>Tachetius</em></div>
-            <div class="timeline-subtext">Odtud dnešní podoba příjmení Tachecí</div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-year">1782</div>
-            <div class="timeline-text">Toleranční patent — rod se hlásí k reformovanému vyznání</div>
-            <div class="timeline-subtext">Ve Vysoké a okolí</div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-year">1933</div>
-            <div class="timeline-text">Dr. Josef Řehák publikuje rodopisnou studii o Tachecích</div>
-            <div class="timeline-subtext">V Časopise Rodopisné společnosti čsl. v Praze</div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-year">dnes</div>
-            <div class="timeline-text">Rod žije — v Čechách, Evropě i zámoří</div>
-            <div class="timeline-subtext">Přes 600 zaznamenaných členů, příběh pokračuje</div>
-          </div>
+          <div class="form-field"><label>Zpráva (volitelně)</label><textarea placeholder="Co víš o rodu, odkud jsi, co tě přivedlo sem…"></textarea></div>
+          <button type="submit" class="btn btn-gold" style="width:100%;text-align:center;border:none;cursor:pointer" id="submitBtn">Odeslat přihlášku</button>
+        </form>
+      </div>
+      <div class="comm-right reveal rd2">
+        <h3>Co se stane po přihlášení?</h3>
+        <p>Každý člen rodu dostane přístup do uzavřené části webu — nástěnky, interaktivního rodokmenu a archivu. Tvoje data nesdílíme veřejně.</p>
+        <p>Pokud máš fotografie, dokumenty nebo vzpomínky — budeme moc rádi.</p>
+        <ul class="benefit-list">
+          <li>Přístup k interaktivnímu rodokmenu přes 12 generací</li>
+          <li>Přístup k digitálnímu archivu dokumentů</li>
+          <li>Možnost přidávat vlastní vzpomínky a fotografie</li>
+          <li>Propojení s ostatními příbuznými po celém světě</li>
+          <li>Upozornění na nové nálezy v archivu</li>
+        </ul>
+        <div class="q-block">
+          <blockquote>„Vedlo by ovšem daleko vypočítávati zde jednotlivé členy starého tohoto selského rodu, jichž shledal jsem jen pro mělnickou větev přes 370…"</blockquote>
+          <cite>— Dr. Josef Řehák, 1933</cite>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <div class="section-divider"><span class="divider-ornament">✦</span></div>
+<footer>
+  <div class="foot-brand">Tachecí</div>
+  <div class="foot-center">„Naše jména jsou tesána do času, ne do kamene."</div>
+  <div class="foot-right">
+    Spravuje <a href="https://www.martinuhlar.cz" target="_blank">Martin Uhlář</a><br>
+    <a href="mailto:martin@martinuhlar.cz">martin@martinuhlar.cz</a><br>
+    Rod od roku ~1550
+  </div>
+</footer>
 
-  <!-- COMMUNITY -->
-  <section class="community-section" id="komunita">
-    <div class="section-inner">
-      <div class="community-grid">
-        <div class="reveal">
-          <p class="section-label">Komunita</p>
-          <h2 class="section-title">Jsi Tachecí?</h2>
-          <p class="section-lead">Přihlas se, napiš nám, přispěj svým dílem do příběhu.</p>
+<script>
+  // Cursor
+  const cur = document.getElementById('cur');
+  const ring = document.getElementById('curRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+  (function anim() {
+    cur.style.left=mx+'px'; cur.style.top=my+'px';
+    rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+    ring.style.left=rx+'px'; ring.style.top=ry+'px';
+    requestAnimationFrame(anim);
+  })();
+  document.querySelectorAll('a,button,.feat,.loc').forEach(el => {
+    el.addEventListener('mouseenter', () => ring.style.transform='translate(-50%,-50%) scale(1.8)');
+    el.addEventListener('mouseleave', () => ring.style.transform='translate(-50%,-50%) scale(1)');
+  });
 
-          <form class="contact-form" id="contactForm">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="fname">Jméno</label>
-                <input type="text" id="fname" placeholder="Jan" />
-              </div>
-              <div class="form-group">
-                <label for="lname">Příjmení</label>
-                <input type="text" id="lname" placeholder="Tachecí" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="email">E-mail</label>
-              <input type="email" id="email" placeholder="jan@tachecí.cz" />
-            </div>
-            <div class="form-group">
-              <label for="relation">Jaká je tvá vazba na rod?</label>
-              <select id="relation">
-                <option value="">— vyber —</option>
-                <option>Příjmení Tachecí je moje rodné</option>
-                <option>Tachecí je v rodu po matce / babičce</option>
-                <option>Jsem potomek příbuzné rodiny</option>
-                <option>Bádám, zajímám se o genealogii</option>
-                <option>Jiné</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="message">Zpráva (volitelně)</label>
-              <textarea id="message" placeholder="Co víš o rodu, odkud jsi, co tě přivedlo sem…"></textarea>
-            </div>
-            <div class="form-submit">
-              <button type="submit" class="btn-primary" style="width:100%;text-align:center;cursor:pointer;border:none;">Odeslat přihlášku</button>
-            </div>
-          </form>
-        </div>
+  // Nav
+  window.addEventListener('scroll', () => document.getElementById('nav').classList.toggle('scrolled', scrollY > 60));
 
-        <div class="community-info reveal reveal-delay-2">
-          <h3>Co se stane po přihlášení?</h3>
-          <p>
-            Každý člen rodu dostane přístup do uzavřené části webu — nástěnky, interaktivního rodokmenu a archivu. Tvoje data nesdílíme veřejně, slouží jen pro potřeby rodiny.
-          </p>
-          <p>
-            Pokud máš fotografie, dokumenty nebo vzpomínky, které by mohly obohatit archiv — budeme moc rádi.
-          </p>
-
-          <ul class="info-list">
-            <li>Přístup k interaktivnímu rodokmenu přes 12 generací</li>
-            <li>Přístup k digitálnímu archivu dokumentů a fotografií</li>
-            <li>Možnost přidávat vlastní vzpomínky a fotografie</li>
-            <li>Propojení s ostatními příbuznými po celém světě</li>
-            <li>Upozornění na nové nálezy a přírůstky v archivu</li>
-          </ul>
-
-          <div style="margin-top:2rem;padding:1.5rem;border:1px solid var(--border);border-radius:2px;background:var(--bg)">
-            <p style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem">Citát z roku 1933</p>
-            <p style="font-style:italic;font-size:1.05rem;color:var(--text-muted);line-height:1.7">
-              „Vedlo by ovšem daleko vypočítávati zde jednotlivé členy starého tohoto selského rodu, jichž shledal jsem jen pro mělnickou větev přes 370…"
-            </p>
-            <p style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--stone-light);margin-top:0.5rem">— Dr. Josef Řehák, 1933</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-brand">Tachecí</div>
-    <p class="footer-quote">„Naše jména jsou tesána do času, ne do kamene."</p>
-    <p class="footer-meta">
-      Spravuje <a href="https://www.martinuhlar.cz" target="_blank">Martin Uhlář</a>
-      &nbsp;·&nbsp; <a href="mailto:martin@martinuhlar.cz">Napsat správci</a>
-      &nbsp;·&nbsp; Rod od roku 1610
-    </p>
-  </footer>
-
-  <script>
-    // ============ THEME TOGGLE ============
-    const html = document.documentElement;
-    const btn = document.getElementById('themeToggle');
-    const icon = document.getElementById('themeIcon');
-    const label = document.getElementById('themeLabel');
-
-    // Auto dark mode based on time
-    const hour = new Date().getHours();
-    if (hour >= 20 || hour < 7) {
-      html.setAttribute('data-theme', 'dark');
-      icon.textContent = '☀';
-      label.textContent = 'Den';
-    }
-
-    btn.addEventListener('click', () => {
-      const isDark = html.getAttribute('data-theme') === 'dark';
-      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-      icon.textContent = isDark ? '☽' : '☀';
-      label.textContent = isDark ? 'Noc' : 'Den';
-    });
-
-    // ============ SCROLL REVEAL ============
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.12 });
-
-    document.querySelectorAll('.reveal, .timeline-item').forEach(el => {
-      observer.observe(el);
-    });
-
-    // ============ SMOOTH SCROLL ============
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', e => {
-        e.preventDefault();
-        const target = document.querySelector(a.getAttribute('href'));
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    });
-
-    // ============ FORM ============
-    document.getElementById('contactForm').addEventListener('submit', e => {
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
       e.preventDefault();
-      const btn = e.target.querySelector('[type="submit"]');
-      btn.textContent = '✓ Odesláno — brzy se ozveme';
-      btn.style.background = 'var(--gold-dark)';
-      btn.disabled = true;
+      const t = document.querySelector(a.getAttribute('href'));
+      if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
-  </script>
+  });
+
+  // Reveal
+  const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('vis'); }), { threshold: 0.1 });
+  document.querySelectorAll('.reveal, .tl-item').forEach(el => obs.observe(el));
+
+  // Form
+  document.getElementById('form').addEventListener('submit', e => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = '✓ Odesláno — brzy se ozveme';
+    btn.style.opacity = '0.7';
+    btn.disabled = true;
+  });
+</script>
 </body>
 </html>
